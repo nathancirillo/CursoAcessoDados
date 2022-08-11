@@ -1,3 +1,5 @@
+-- INTRODUÇÃO: 
+
 - Iremos usar o pacote externo Dapper, mantendo o Microsoft.Data.SqlClient;
 - Ele é uma extensão do Microsoft.Data.SqlClient, onde adiciona algumas funcionalidades a ele; 
 - A realização da conexão ainda é necessária, mas ele se vira para abrir a conexão caso não exista;
@@ -14,7 +16,8 @@
   usar o ALIAS para deixar como mesmo nome;
 - Uma coisa interessante é sempre deixar na mesma ordem os campos que o SQL retorna e na classe;
 
-- TRABALHANDO COM INSERTS:
+-- TRABALHANDO COM INSERTS:
+
 - Ao inserir dados devemos nos preocupar com alguns pontos a mais do que a consulta;
 - Ao trabalhar com GUID, por exemplo, podemos gerar um Guid.NewGuid() no C# e enviar para o banco
   ou no próprio insert enviar o comando NEWID();
@@ -34,6 +37,25 @@
 - Caso os parâmetros tenham nomes diferentes das propriedades é necessário informar no objeto anônimo;
 - O método Execute() irá sempre retornar um número inteiro com a quantidade de linhas que foram afetadas;
 
+-- TRABALHANDO COM UPDATE:
+
+- Funciona de forma similar ao INSERT, usando o método EXECUTE() do objeto connection;
+- O retorno do método Execute() é a quantidade de linhas afetadas;
+- Caso não encontre o registro para alterar será informado que nada foi alterado.
 
 
+-- MÉTODO EXECUTEMANY() DO Dapper:
 
+- Consiste na possibilidade de inserir múltiplos itens ao mesmo tempo variando os parâmetros;
+- Ao invés de passar um objeto no parâmetro passo um array de objetos separando cada item por vírgula; 
+- O mesmo vale para os métodos DELETEMANY() e UPDATEMANY();
+- Eles permitem alterar ou apagar múltiplos itens de uma vez; 
+
+
+-- EXECUTANDO PROCEDURES NO DAPPER: 
+-  O Dapper também permite realizar a execução de Stored Procedures; 
+-  Como no Execute passamos o tipo como StoredProcedure, não é necessário informar o EXEC e nem o parâmetro;
+   var sql = "[spDeleteStudent]";
+- A execução também se dá através do método Execute() do objeto connection, porém passando o tipo de comando; 
+- connection.Execute(sql, parâmetros, commandType: System.Data.commandType.StoredProcedure);
+- Irá retornar também o número de linhas afetadas com a execução da SP;
