@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bBHcV8CSaT4T1TjcoBZMwv0noPFODpk0zBvkIsxpJWbmLdPnUklI1Zvslzylcw5Xv4mipBcB4Y+PpUqUYvzuDQ==",
+  "dgSpecHash": "EB5OMr7/YZxlDZyoebSINc1GMjZCZWyuhn4rJGyBTrmZsR4Nw9i8xq4vjNIkk/lskh2vT4qdkDpyBNJI9OckWA==",
   "success": true,
-  "projectFilePath": "C:\\Projetos\\BaltaIO\\CursoAcessoDados\\AcessoDapper\\AcessoDapper.csproj",
+  "projectFilePath": "C:\\Projetos\\Pessoais\\BaltaIO\\CursoAcessoDados\\AcessoDapper\\AcessoDapper.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\teste\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\teste\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

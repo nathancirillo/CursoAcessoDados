@@ -14,11 +14,11 @@
 - Se quiser trazer um único item ai usaríamos o método First() e não o Query();
 - Para que o mapeamento ocorra adequadamente, os campos do SQL deve ser o mesmo da classe. No SQL podemos
   usar o ALIAS para deixar como mesmo nome;
-- Uma coisa interessante é sempre deixar na mesma ordem os campos que o SQL retorna e na classe;
+- Uma coisa interessante é sempre deixar na mesma ordem os campos que o SQL retorna e na classe.
 
 -- TRABALHANDO COM INSERTS:
 
-- Ao inserir dados devemos nos preocupar com alguns pontos a mais do que a consulta;
+- Ao inserir dados devemos nos preocupar com alguns pontos a mais do que na consulta;
 - Ao trabalhar com GUID, por exemplo, podemos gerar um Guid.NewGuid() no C# e enviar para o banco
   ou no próprio insert enviar o comando NEWID();
 - Dica do balta: gerar o máximo possível de informações na aplicação e usar o SQL só para manipulação 
@@ -35,7 +35,7 @@
 - Assim como a consulta, o UPDATE e o DELETE também são executandos usando o Execute();
   e o segundo um objeto anônimo com os valores do parâmetros; 
 - Caso os parâmetros tenham nomes diferentes das propriedades é necessário informar no objeto anônimo;
-- O método Execute() irá sempre retornar um número inteiro com a quantidade de linhas que foram afetadas;
+- O método Execute() irá sempre retornar um número inteiro com a quantidade de linhas que foram afetadas.
 
 -- TRABALHANDO COM UPDATE:
 
@@ -49,13 +49,66 @@
 - Consiste na possibilidade de inserir múltiplos itens ao mesmo tempo variando os parâmetros;
 - Ao invés de passar um objeto no parâmetro passo um array de objetos separando cada item por vírgula; 
 - O mesmo vale para os métodos DELETEMANY() e UPDATEMANY();
-- Eles permitem alterar ou apagar múltiplos itens de uma vez; 
+- Eles permitem alterar ou apagar múltiplos itens de uma vez. 
 
 
 -- EXECUTANDO PROCEDURES NO DAPPER: 
 -  O Dapper também permite realizar a execução de Stored Procedures; 
 -  Como no Execute passamos o tipo como StoredProcedure, não é necessário informar o EXEC e nem o parâmetro;
-   var sql = "[spDeleteStudent]";
-- A execução também se dá através do método Execute() do objeto connection, porém passando o tipo de comando; 
-- connection.Execute(sql, parâmetros, commandType: System.Data.commandType.StoredProcedure);
-- Irá retornar também o número de linhas afetadas com a execução da SP;
+   Exemplo.: var sql = "[spDeleteStudent]";
+-  A execução também se dá através do método Execute() do objeto connection, porém passando o tipo de comando; 
+-  Exemplo.: connection.Execute(sql, parâmetros, commandType: System.Data.commandType.StoredProcedure);
+-  Irá retornar também o número de linhas afetadas com a execução da SP.
+
+-- LENDO OS DADOS DE UMA PROCEDURE: 
+-  O mecanismo de leitura de uma procedure é similar ao de execução;
+-  Usa-se o método Query() do objeto connnection, pois irá retornar o valor; 
+-  Sempre iremos passar três parâmetros para o método Query() ao fazer uma consulta: 
+   1) O comando SQL que no caso desse exemplo é o nome da procedure; 
+   2) Os parâmetros do comando, ou seja, o que a procedure espera receber. Passamos como um objeto;
+   3) O tipo de comando que é StoredProcedure. 
+-  Podemos ou não tipar através do uso de generics o método Query<Tipo>(); 
+-  Se tipado irá retornar uma lista do valor especificado, caso contrário um Inumerable<dinamic>
+
+
+-- RECURSO DO SQL SERVER, EXECUTESCALAR: 
+-  Ao usar o Execute() tradicional com o insert, o update, o delete ou o create sempre teremos como retorno um INT; 
+-  Esse retorna diz respeito ao nº de linhas afetadas pelo comandos executado; 
+-  O ExecuteScalar permite executar algo e retornar um valor diferente do de linhas afetadas; 
+-  Por exemplo.: inserir um item na base e saber o ID que foi gerado desse item; 
+-  Isso é importante, pois não temos o controle do ID que foi gerado pelo banco, então conseguimos retorná-lo; 
+-  O método ExecuteScalar deve ser tipado com o tipo de retorno: ExecuteScalar<Guid>;
+-  Após o comando de insert deve haver um SELECT para trazer o dado desejado;
+-  Uma dica é usar o SELECT SCOPE_IDENTITY() para tipos inteiros ou o OUTPUT para tipos GUID. 
+
+-- TRABALHANDO COM MAPEAMENTO:
+-  A ideia é começar a trabalhar com os JOINS que vimos no curso de SQL Server; 
+-  Primeiro iremos ver o relacionamento: Um para Um; e depois: Um para Muitos;
+-  Ex de relacionamento Um para Um: um item da carreira tem somente um curso:
+   SELECT * FROM [CarrerItem] INNER JOIN [Course]
+   ON [CarrerItem].[CourseId] = [Course].[Id]
+-  Ao trabalhar com mapeamento é interessante tipar os dados através de modelos. Dá para trabalhar sem,
+   porém fica muito confuso para o Dapper; 
+-  O sql ficará como sendo o inner apresentado, onde devemos passá-lo para o método Query do objeto connection;
+-  O mapeamento do objeto curso dentro de um item da carreira é feito da seguinte forma: 
+   var items = connection.Query<CarrerItem, Course, CarrerItem>
+                        (sql, (carrerItem, course) => {
+                            carrerItem.Course = course;
+                            return carrerItem;
+                        }, splitOn: "Id"); 
+   
+   Observações: 
+   O generic apresentado em Query mostra que temos dois itens relacionados: CarrerItem e Course; 
+   Sendo que CarrerItem contém um objeto do tipo Course, e o resultado será apresentado em um CarrerItem;
+   É por isso que existem três parâmetros: <contém, está contido, resultado>
+   A função splitOn diz onde o objeto que está contido, no caso o Course, começa.  
+   
+
+-- MAPEAMENTO MUITOS PARA MUITOS
+-  Na verdade esse tipo de relação não existe. No SQL Server movemos as chaves estrangeiras para uma tabela associativa. 
+-  A junção de dois UM PARA MUITOS torna-se um MUITOS PARA MUITOS;  
+-  Exemplo de Muitos para Muitos: 
+   Tenho um post no blog que possui muitas categorias. E uma categoria pode ter muitos posts; 
+-  Para trabalhar no Dapper com esse tipo de relacionamento podemos usar a função multi-select do Dapper; 
+-  Nesse método é possível executar qualquer tipo de select dentro dele;
+-  A única diferença é que dentro do nosso comando SQL podemos ter N selects;

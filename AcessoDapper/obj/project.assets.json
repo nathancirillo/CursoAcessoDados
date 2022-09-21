@@ -2461,11 +2461,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Projetos\\BaltaIO\\CursoAcessoDados\\AcessoDapper\\AcessoDapper.csproj",
+      "projectUniqueName": "C:\\Projetos\\Pessoais\\BaltaIO\\CursoAcessoDados\\AcessoDapper\\AcessoDapper.csproj",
       "projectName": "AcessoDapper",
-      "projectPath": "C:\\Projetos\\BaltaIO\\CursoAcessoDados\\AcessoDapper\\AcessoDapper.csproj",
+      "projectPath": "C:\\Projetos\\Pessoais\\BaltaIO\\CursoAcessoDados\\AcessoDapper\\AcessoDapper.csproj",
       "packagesPath": "C:\\Users\\teste\\.nuget\\packages\\",
-      "outputPath": "C:\\Projetos\\BaltaIO\\CursoAcessoDados\\AcessoDapper\\obj\\",
+      "outputPath": "C:\\Projetos\\Pessoais\\BaltaIO\\CursoAcessoDados\\AcessoDapper\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
