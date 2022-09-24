@@ -1,25 +1,46 @@
 using Blog.Models;
-using Dapper.Contrib.Extensions;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace CursoAcessoDados.Blog.Repositories
 {
-    public class UserRepository
+    public class UserRepository : Repository<User>
     {
-          private SqlConnection _connection;
+        private readonly SqlConnection _connection;
+        
+        public UserRepository(SqlConnection connection) : base(connection)
+        => _connection = connection;
 
-          public UserRepository()
-          {
-             _connection = new SqlConnection("Server=TARGETN107\\SQLEXPRESS; Database=BlogDoBalta; User ID=sa; Password=123456; Encrypt=False;");
-          }
+        public List<User> GetWithRoles()
+        {
+            var query = @"
+               select usr.*,ro.* from [User] usr
+               left join [UserRole] usro on  usro.UserId = usr.Id
+               left join [Role] ro on ro.Id = usro.RoleId
+            ";
 
-          public IEnumerable<User> Get()                      
-            => _connection.GetAll<User>();           
-          
-          public User Get(int id)                  
-            => _connection.Get<User>(id);           
-          
-          public void Insert(User user)                   
-            => _connection.Insert<User>(user);
+            var users = new List<User>();
+
+            var items = _connection.Query<User, Role, User>
+            (
+                query,
+                (user, role) => 
+                {
+                     var usr = users.FirstOrDefault(x => x.Id == user.Id);
+                     if(usr == null)
+                     {
+                        usr = user;
+                        if(role != null) 
+                           usr.Roles.Add(role);
+                        users.Add(usr);
+                     }
+                     else
+                        usr.Roles.Add(role);
+                     return user; 
+                }, splitOn: "Id");
+            
+            return users;
+
+        }
     }
 }
